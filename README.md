@@ -1,5 +1,5 @@
 # mc-js-proxy
-A JavaScript proxy for Minecraft
+A JavaScript proxy for Minecraft  
 This is a project I made just for fun, please do not expect perfect support etc...
 ## You can use it to:
 * Debug/Log packets
