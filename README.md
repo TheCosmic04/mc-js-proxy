@@ -12,6 +12,6 @@ This is a project I made just for fun, please do not expect perfect support etc.
 * Fixing issues with packet's
 * Allowing more people to use the proxy
 ## How to use it:
-`git clone https://github.com/JuCeLoDE/mc-js-proxy/`
-`npm i`
-`node index.js <host> <port> <version>`
+* `git clone https://github.com/JuCeLoDE/mc-js-proxy/`
+* `npm i`
+* `node index.js <host> <port> <version>`
