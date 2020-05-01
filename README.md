@@ -2,7 +2,7 @@
 A JavaScript proxy for Minecraft  
 This is a project I made just for fun, please do not expect perfect support etc...
 ## You can use it to:
-* Debug/Log packets
+* Debug/Log/Modify packets
 * Spawn copies of yourself that for example have a bigger x coordinate
 * Log positions of lightning_bolts
 * Do other cool stuff
