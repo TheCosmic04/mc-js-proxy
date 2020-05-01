@@ -7,7 +7,7 @@ var proxy = mc.createServer({
 	"host": `127.0.0.1`,
 	"port": 25565,
 	"online-mode": false,
-	"version": serverPort,
+	"version": version,
 	"keepAlive": false,
 	"maxPlayers": 1,
 	"motd": `§eJS§aProxy §8- §dVersion ${version}\n§b${serverIp}:${serverPort}`
