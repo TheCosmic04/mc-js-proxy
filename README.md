@@ -10,7 +10,6 @@ This is a project I made just for fun, please do not expect perfect support etc.
 * ~~Session passthrough~~ (not possible)
 * Chat control (ex: `proxy connect kbpw.de`)
 * Fixing Timeout issues
-* Fixing issues with packets
 * Allowing more people to use the proxy
 ## How to use it:
 * `git clone https://github.com/JuCeLoDE/mc-js-proxy/`
