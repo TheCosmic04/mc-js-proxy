@@ -7,7 +7,7 @@ This is a project I made just for fun, please do not expect perfect support etc.
 * Log positions of lightning_bolts
 * Do other cool stuff
 ## Planned:
-* Session passthrough
+* ~~Session passthrough~~ (not possible)
 * Chat control (ex: `proxy connect kbpw.de`)
 * Fixing Timeout issues
 * Fixing issues with packets
