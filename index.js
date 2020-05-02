@@ -7,16 +7,16 @@ var proxy = mc.createServer({
 	"host": `127.0.0.1`,
 	"port": 25565,
 	"online-mode": false,
-	"version": version,
+	"version": false,
 	"keepAlive": false,
 	"maxPlayers": 1,
-	"motd": `§eJS§aProxy §8- §dVersion ${version}\n§b${serverIp}:${serverPort}`
+	"motd": `§eJS§aProxy\n§b${serverIp}:${serverPort}`
 });
 proxy.on(`login`, function(client) {
 	var bot = mc.createClient({
 		"host": serverIp,
 		"port": serverPort,
-		"version": version,
+		"version": client.version,
 		"username": client.username,
 		"keepAlive": true
 	});
