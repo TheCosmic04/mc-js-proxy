@@ -6,7 +6,7 @@ This proxy allow multiple client to be connected at once in differents servers.
 * `/connect <ip> [port]` to connect to a server (default port is 25565)
 * `/proxylist` or `/plist` allow to see all player connected to the proxy
 
-## future features:
+## Future features:
 * premium account login `/login <login> <password>` (currently the proxy is only cracked)
 * change name of the account `/setusername <username>`
 * a better command handler that will allow also for custom commands
@@ -14,9 +14,9 @@ This proxy allow multiple client to be connected at once in differents servers.
 * tab complete for proxy commands
 * and more...
 
-## currently known bugs:
+## Currently known bugs:
 * tab list header and footer dont change when the player change server
-* entities and chunks sometimes dont unload when the player change server
+* ~~entities and chunks sometimes dont unload when the player change server~~
 * connecting to the same server you are already connected will get you in a infinite loop where the proxy keep try to connecting to the server failing
 
 ## How to use it:
