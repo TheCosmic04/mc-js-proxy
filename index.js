@@ -1,4 +1,5 @@
 var mc = require(`minecraft-protocol`);
+require('events').EventEmitter.defaultMaxListeners = Infinity;
 
 var version = process.argv[2] || "1.15.2";
 
@@ -97,6 +98,10 @@ function S2C(id, packet, meta) {  //ServerToClient
             bot.end();
             cancelled = true;
             break;
+        case "kick_disconnect":
+            bot.end();
+            cancelled = true;
+            break;
         case "player_info":
             if (!Array.isArray(packet.data)) 
                 break;
@@ -117,6 +122,14 @@ function S2C(id, packet, meta) {  //ServerToClient
                     break;
                 
             }
+            break;
+        case "spawn_entity_painting":
+        case "spawn_entity_living":
+            bot.entities[packet.entityId] = packet;
+            break;
+        case "entity_destroy":
+            if (bot.entities[packet.entityId] != null)
+                delete bot.entities[packet.entityId];
             break;
             
     }
@@ -206,6 +219,7 @@ function chatEvent(client, packet, meta) {
                         console.log(`Adding bot id: ${client.id} (IP: ${bot.socket._host}, Username: ${client.username})`);
                         if (clients[client.id].bot != null) clients[client.id].bot.end();
                         bot.players = {};
+                        bot.entities = {};
                         clients[client.id].bot = bot;
                         clients[client.id].connecting = false;
                         client.write("chat", message(`§aSuccessfully connected to ${bot.socket._host}`));
@@ -235,6 +249,10 @@ function bindEvents(bot, id) {
     bot.on("end", function(reason) {
         if (clients[id] == null) return;
         if (clients[id] == null || clients[id].bot != bot) {
+            let entities = [];
+            Object.keys(bot.entities).forEach(key => {entities.push(bot.entities[key].entityId)});
+            clients[id].client.write("entity_destroy", {entityIds: entities});
+            
             Object.keys(bot.players).forEach(key => {
                 clients[id].client.write("player_info", {
                     action: 4,
