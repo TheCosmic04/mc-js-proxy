@@ -1,7 +1,6 @@
 var mc = require(`minecraft-protocol`);
 var serverIp = process.argv[2];
 var serverPort = process.argv[3];
-var version = process.argv[4];
 enable = false;
 var proxy = mc.createServer({
 	"host": `127.0.0.1`,
@@ -10,7 +9,7 @@ var proxy = mc.createServer({
 	"version": false,
 	"keepAlive": false,
 	"maxPlayers": 1,
-	"motd": `§eJS§aProxy\n§b${serverIp}:${serverPort}`
+	"motd": `§eJSProxy\n§b${serverIp}:${serverPort}`
 });
 proxy.on(`login`, function(client) {
 	var bot = mc.createClient({
