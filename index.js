@@ -82,7 +82,6 @@ function C2S(id, packet, meta) {  //ClientToServer
             break;
     }
 
-    let bot = (clients[id].bot != null) ? clients[id].bot : null;
 
     if (!cancelled)
         fowardPacket(id, packet, meta, {type: "client", source: client});
@@ -119,6 +118,9 @@ function S2C(id, packet, meta) {  //ServerToClient
                     break;
                 case 4:
                     delete bot.players[packet.data[0].UUID];
+                    break;
+                default:
+                    console.log(packet);
                     break;
                 
             }
@@ -164,6 +166,7 @@ function fowardPacket(id, packet, meta, source) {
     }
 }
 
+var timeout = 15;
 var prefix = "/";
 function chatEvent(client, packet, meta) {
     let content = packet.message;
@@ -202,8 +205,25 @@ function chatEvent(client, packet, meta) {
                 clients[client.id].connecting = false;
                 return;
             }
+            if (clients[client.id].connecting === true) {
+                console.log(`Adding bot id: ${client.id} (IP: ${options.host}, Username: ${client.username})`);
+                client.write("chat", message(`§aConnecting to ${options.host}...`));
+            } else {
+                client.write("chat", message(`§4Error: Couldnt connect to the server ${options.host}`));
+            }
+
+            setTimeout(function() {
+                if (clients[client.id] == null || clients[client.id].bot == bot) return;
+                console.log(`Bot id ${client.id} timed out!`);
+                clients[client.id].connecting = false;
+                if (!bot.ended) {
+                    bot.end();
+                }
+                client.write("chat", message("§4Error: timeout!"));
+            }, timeout * 1000);
 
             bot.on("error", function(err) {
+                console.log(err);
                 if (clients[client.id] == null || clients[client.id].bot == bot) return;
                 console.log(err);
                 clients[client.id].connecting = false;
@@ -216,7 +236,6 @@ function chatEvent(client, packet, meta) {
                 switch (meta.name) {
                     case "login":
                         client.write("game_state_change", {reason: 3, gameMode: packet.gameMode});
-                        console.log(`Adding bot id: ${client.id} (IP: ${bot.socket._host}, Username: ${client.username})`);
                         if (clients[client.id].bot != null) clients[client.id].bot.end();
                         bot.players = {};
                         bot.entities = {};
