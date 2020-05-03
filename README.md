@@ -12,12 +12,14 @@ This proxy allow multiple client to be connected at once in differents servers.
 * a better command handler that will allow also for custom commands
 * event files that will allow you to modify packets
 * tab complete for proxy commands
+* settings file
 * and more...
 
 ## Currently known bugs:
 * tab list header and footer dont change when the player change server
 * ~~entities and chunks sometimes dont unload when the player change server~~
-* connecting to the same server you are already connected will get you in a infinite loop where the proxy keep try to connecting to the server failing
+* ~~connecting to the same server you are already connected will get you in a infinite loop where the proxy keep try to connecting to the server failing~~ (added timeout timer)
+* Issue in chunk loading
 
 ## How to use it:
 * `git clone https://github.com/TheCosmic04/mc-js-proxy.git`
