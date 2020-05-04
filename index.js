@@ -1,8 +1,14 @@
 var mc = require(`minecraft-protocol`);
+var handler = require("./command-handler.js");
+var util = require("./util.js");
+
 require('events').EventEmitter.defaultMaxListeners = Infinity;
 
-var version = process.argv[2] || "1.15.2";
-
+var version = process.argv[2] || require("./config.json").version || "1.15.2";
+var timeout = 15;
+var prefix = "/";
+handler.init(prefix, "./commands");
+handler.bindEvents = bindEvents;
 
 var options = {
     host:"localhost",
@@ -48,7 +54,7 @@ proxy.on("login", function(client) {
     clients[client.id].connecting = false;
 
     initilizeClient(client);
-    client.write("chat", message("Commands:\n -/connect <ip> [port]  -> connect to a server (default port: 25565).\n -/plist or /proxylist  -> List of all the players connected to the proxy."));
+    client.write("chat", util.message("Commands:\n -/connect <ip> [port]  -> connect to a server (default port: 25565).\n -/plist or /proxylist  -> List of all the players connected to the proxy."));
 
 
     client.write(`login`, {
@@ -80,8 +86,10 @@ function C2S(id, packet, meta) {  //ClientToServer
         case "chat":
             (chatEvent(client, packet, meta) === true) ? cancelled = true : null;
             break;
+        case "tab_complete":
+            //console.log(packet);
+            break;
     }
-
 
     if (!cancelled)
         fowardPacket(id, packet, meta, {type: "client", source: client});
@@ -133,6 +141,11 @@ function S2C(id, packet, meta) {  //ServerToClient
             if (bot.entities[packet.entityId] != null)
                 delete bot.entities[packet.entityId];
             break;
+        case "login":
+            cancelled = true;
+        case "tab_complete":
+            //console.log(packet);
+            break;
             
     }
 
@@ -166,95 +179,21 @@ function fowardPacket(id, packet, meta, source) {
     }
 }
 
-var timeout = 15;
-var prefix = "/";
 function chatEvent(client, packet, meta) {
     let content = packet.message;
     let args = content.split(" ");
-    let cmd = args.shift().slice(prefix.length);
+    let cmd = args.shift().slice(handler.prefix.length);
+
+    if (!handler.isCommand(cmd)) return false;
+    let result = handler.execute(client, cmd, args, clients);
 
     let cancelled = false;
-    switch (cmd.toLowerCase()) {
-        case "connect":
-            cancelled = true;
-            if (args.length < 1) {
-                client.write("chat", message(`§4Usage: ${prefix}connect <ip> [port]`));
-                cancelled = true;
-                break;
-            }
-            if (clients[client.id].connecting === true) {
-                client.write("chat", message("§4Already connecting to a server!"));
-                cancelled = true;
-                break;
-            }
-            clients[client.id].connecting = true;
-
-            let options = {
-                host: args[0],
-                port: args[1] || 25565,
-                version: version,
-                username: client.username,
-                keepAlive: true
-            };
-            let bot = null;
-            try {
-                bot = mc.createClient(options);
-            } catch (err) {
-                console.log(err);
-                client.write("chat", message(`§4${err}`));
-                clients[client.id].connecting = false;
-                return;
-            }
-            if (clients[client.id].connecting === true) {
-                console.log(`Adding bot id: ${client.id} (IP: ${options.host}, Username: ${client.username})`);
-                client.write("chat", message(`§aConnecting to ${options.host}...`));
-            } else {
-                client.write("chat", message(`§4Error: Couldnt connect to the server ${options.host}`));
-            }
-
-            setTimeout(function() {
-                if (clients[client.id] == null || clients[client.id].bot == bot) return;
-                console.log(`Bot id ${client.id} timed out!`);
-                clients[client.id].connecting = false;
-                if (!bot.ended) {
-                    bot.end();
-                }
-                client.write("chat", message("§4Error: timeout!"));
-            }, timeout * 1000);
-
-            bot.on("error", function(err) {
-                console.log(err);
-                if (clients[client.id] == null || clients[client.id].bot == bot) return;
-                console.log(err);
-                clients[client.id].connecting = false;
-                client.write("chat", message(`§4${err}`));
-                bot.end();
-            });
-
-            bot.on("packet", function(packet, meta) {
-                if (clients[client.id] == null || clients[client.id].bot == bot) return;
-                switch (meta.name) {
-                    case "login":
-                        client.write("game_state_change", {reason: 3, gameMode: packet.gameMode});
-                        if (clients[client.id].bot != null) clients[client.id].bot.end();
-                        bot.players = {};
-                        bot.entities = {};
-                        clients[client.id].bot = bot;
-                        clients[client.id].connecting = false;
-                        client.write("chat", message(`§aSuccessfully connected to ${bot.socket._host}`));
-                        bindEvents(bot, client.id)
-                        break;
-                }
-            });
-            break;
-        case "plist":
-        case "proxylist":
-            let players = Object.keys(clients).filter(key => {return isNaN(Number(key))});
-            client.write("chat", message(`Players:\n ${players.join(", ")}`));
-            cancelled = true;
-            break;
-
-
+    if (result.status == "error") {
+        client.write("chat", message("§4An error occurred while executing the command!"));
+        console.log(`Code: ${result.code}\nError: ${result.error}`);
+    } else if (result.status == "success") {
+        if (typeof(result.value) === "boolean")
+            cancelled = result.value;
     }
     return cancelled;
 }
@@ -289,12 +228,8 @@ function bindEvents(bot, id) {
         }
         console.log(`Removing bot id: ${id} (username: ${clients[id].client.username})`);
 
-        clients[id].client.end();
+        clients[id].client.end(reason);
         // delete bot;
     })
 
-}
-
-function message(msg) {
-    return {message: JSON.stringify({text: msg}), position: 1};
 }
