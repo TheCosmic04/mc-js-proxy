@@ -1,22 +1,16 @@
 {
-  "name": "jsmcproxy",
-  "version": "0.0.1",
-  "description": "A JavaScript proxy for Minecraft ",
+  "name": "nodejs-proxy",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "dependencies": {
-    "minecraft-protocol": "^1.11.0"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "JuCeLoDE",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JuCeLoDE/mc-js-proxy.git"
-  },
-  "bugs": {
-    "url": "https://github.com/JuCeLoDE/mc-js-proxy/issues"
-  },
-  "homepage": "https://github.com/JuCeLoDE/mc-js-proxy#readme"
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "minecraft-protocol": "^1.11.0"
+  }
 }
